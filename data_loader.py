@@ -62,10 +62,28 @@ def get_dataloaders() -> Tuple[DataLoader, DataLoader, DataLoader]:
     val_dataset = BearingDataset(val_data, config.SEQUENCE_LEN)
     test_dataset = BearingDataset(test_data, config.SEQUENCE_LEN)
     
-    # Create dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=config.BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=config.BATCH_SIZE, shuffle=False)
+    # Create dataloaders with GPU optimization
+    train_loader = DataLoader(
+        train_dataset, 
+        batch_size=config.BATCH_SIZE, 
+        shuffle=True,
+        pin_memory=True,  # Faster GPU transfer
+        num_workers=4     # Parallel data loading
+    )
+    val_loader = DataLoader(
+        val_dataset, 
+        batch_size=config.BATCH_SIZE, 
+        shuffle=False,
+        pin_memory=True,
+        num_workers=4
+    )
+    test_loader = DataLoader(
+        test_dataset, 
+        batch_size=config.BATCH_SIZE, 
+        shuffle=False,
+        pin_memory=True,
+        num_workers=4
+    )
     
     print(f"Train samples: {len(train_dataset)}")
     print(f"Val samples: {len(val_dataset)}")

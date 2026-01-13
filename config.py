@@ -35,7 +35,7 @@ DROPOUT = 0.3          # Dropout rate
 
 # Training settings
 SEQUENCE_LEN = 250     # Lookback window (from Telemanom paper)
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 LEARNING_RATE = 0.001
 EPOCHS = 50
 PATIENCE = 10          # Early stopping patience

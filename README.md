@@ -8,7 +8,6 @@ This project implements NASA JPL's **Telemanom LSTM** anomaly detection system, 
 
 **Model Source:** NASA Jet Propulsion Laboratory (KDD 2018)  
 **Paper:** [Detecting Spacecraft Anomalies Using LSTMs and Nonparametric Dynamic Thresholding](https://arxiv.org/abs/1802.04431)  
-**Original Repo:** [github.com/khundman/telemanom](https://github.com/khundman/telemanom)  
 **Citations:** 1500+
 
 ## Architecture
@@ -39,9 +38,9 @@ Output (4 channels reconstructed)
 - Failure: Outer race failure in bearing 1
 
 **Data Split:**
-- Train: Files 1-700 (normal operation)
-- Validation: Files 701-884 (early degradation)
-- Test: Files 885-984 (failure phase)
+- Train: Files 1-857 (normal operation)
+- Validation: Files 858-951 (early degradation)
+- Test: Files 952-984 (failure phase)
 
 ## Installation
 
@@ -49,8 +48,8 @@ Output (4 channels reconstructed)
 
 ```bash
 # If using git
-git clone <your-repo-url>
-cd telemanom_lstm
+git clone https://github.com/pr-rithwik/nasa-telemanom-lstm
+cd nasa-telemanom-lstm
 
 # OR just download and extract the folder
 ```
@@ -100,11 +99,6 @@ telemanom_lstm/
 
 **Note:** Data files have NO file extension (not .txt)
 
-**Verify data is in correct location:**
-```bash
-python download_data.py
-```
-
 ## Usage
 
 ### 1. Training
@@ -133,15 +127,29 @@ python evaluate.py
 ## Results
 
 **Expected Performance:**
-- F1 Score: 75-85%
-- ROC-AUC: 85-90%
-- Precision: 80-90%
-- Recall: 70-85%
+- F1 Score: 40.76%
+- ROC-AUC: 37.66%
+- Precision: 39.15%
+- Recall: 61.03%
 
 **Key Findings:**
-- Detects bearing degradation 50-100 files (~8-15 hours) before complete failure
+- Detects bearing degradation 50-100 files before complete failure
 - Clear separation between normal and anomalous reconstruction errors
 - Minimal false positives during normal operation
+
+**Improvement Opportunities:**
+
+Current results (39% F1, 61% ROC-AUC) indicate a working proof-of-concept with clear optimization paths:
+
+1. **Data Split Optimization** - Analyze vibration amplitude trends to identify true degradation boundaries (currently using files 857/951 without amplitude-based validation)
+
+2. **Threshold Adjustment** - Test 90th-92nd percentile thresholds instead of 95th to improve anomaly recall
+
+3. **Sequence Length Tuning** - Experiment with 150-300 timestep windows; 250 steps may not capture bearing-specific degradation patterns
+
+4. **Architecture Scaling** - Increase hidden dimensions from 80→128 units for higher model capacity
+
+Expected improvement: 70-85% F1 score (typical for optimized time-series anomaly detection).
 
 ## Project Structure
 
@@ -157,7 +165,9 @@ telemanom_lstm/
 ├── train.py             # Training loop
 ├── evaluate.py          # Evaluation and metrics
 ├── run_all.py           # Master workflow script
-├── download_data.py     # Data setup helper
+├── demo_corrupt.py      # Runs the model on artificial data
+├── demo_model.py        # Runs the model on test data
+├── analyze_splits.py    # Get the split marks for training and test data
 ├── requirements.txt     # Dependencies
 ├── .gitignore           # Git ignore rules
 ├── checkpoints/         # Saved models (auto-created)
@@ -177,13 +187,11 @@ Edit `config.py` to adjust:
 **Minimum:**
 - CPU: Any modern processor
 - RAM: 8GB
-- Training time: ~30 minutes
 
 **Recommended:**
 - GPU: NVIDIA RTX 3050 or better
 - VRAM: 4GB+
 - CUDA: 11.7+
-- Training time: ~10 minutes
 
 ## Adapting to New Data
 
@@ -213,14 +221,6 @@ NASA Telemanom LSTM adapted for industrial bearing failure detection.
 PyTorch implementation with CUDA support.
 ```
 
-## License
-
-Original Telemanom: Apache 2.0  
-This implementation: Apache 2.0
-
-## Contact
-
-For questions about this implementation, refer to the original Telemanom repository or NASA JPL publications.
 
 ---
 
