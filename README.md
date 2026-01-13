@@ -111,7 +111,6 @@ python train.py
 - Trains model for up to 50 epochs
 - Early stopping with patience=10
 - Saves best model to `checkpoints/best_model.pt`
-- Training time: ~10-15 minutes on RTX 3050
 
 ### 2. Evaluation
 
