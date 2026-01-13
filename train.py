@@ -7,6 +7,12 @@ from tqdm import tqdm
 import config
 from model import TelemanomLSTM
 from data_loader import get_dataloaders
+import os
+
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+torch.cuda.set_device(0)
+
 
 class Trainer:
     """Handle training and validation"""
@@ -30,7 +36,9 @@ class Trainer:
         self.model.train()
         total_loss = 0
         
-        for inputs, targets in dataloader:
+        # Add progress bar
+        pbar = tqdm(dataloader, desc="Training", leave=False)
+        for inputs, targets in pbar:
             inputs, targets = inputs.to(self.device), targets.to(self.device)
             
             self.optimizer.zero_grad()
@@ -40,6 +48,7 @@ class Trainer:
             self.optimizer.step()
             
             total_loss += loss.item()
+            pbar.set_postfix({'loss': f'{loss.item():.6f}'})
         
         return total_loss / len(dataloader)
     
@@ -60,22 +69,29 @@ class Trainer:
     def train(self, train_loader, val_loader):
         """Full training loop with early stopping"""
         print(f"\nTraining Telemanom LSTM for {config.EPOCHS} epochs...")
+        # print("(Each epoch takes ~10-15 seconds on GPU, ~2-3 minutes on CPU)\n")
         
         for epoch in range(config.EPOCHS):
+            # Show we're starting the epoch
+            print(f"Epoch {epoch+1}/{config.EPOCHS}...", end=" ", flush=True)
+            
             train_loss = self.train_epoch(train_loader)
             val_loss = self.validate(val_loader)
             
-            print(f"Epoch {epoch+1}/{config.EPOCHS} - Train Loss: {train_loss:.6f} - Val Loss: {val_loss:.6f}")
+            # Print results on same line
+            print(f"Train Loss: {train_loss:.6f}, Val Loss: {val_loss:.6f}", end="")
             
             # Early stopping
             if val_loss < self.best_val_loss:
                 self.best_val_loss = val_loss
                 self.patience_counter = 0
                 self.save_checkpoint()
+                print(" ✓ (saved)")
             else:
                 self.patience_counter += 1
+                print(f" (patience: {self.patience_counter}/{config.PATIENCE})")
                 if self.patience_counter >= config.PATIENCE:
-                    print(f"Early stopping at epoch {epoch+1}")
+                    print(f"\nEarly stopping at epoch {epoch+1}")
                     break
         
         print(f"\nBest validation loss: {self.best_val_loss:.6f}")
