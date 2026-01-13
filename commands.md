@@ -18,7 +18,7 @@ cd nasa-telemanom-lstm
 pip install -r requirements.txt
 ```
 **Does:** Installs PyTorch, NumPy, Matplotlib, scikit-learn, and other required packages.
-
+*Note:* pytorch has to be installed separaltely as it should be aligned to the CUDA version of the system. The command to install it is in the comment section of `requirements.txt` file.
 ---
 
 ## Data Analysis (Optional but Recommended)
